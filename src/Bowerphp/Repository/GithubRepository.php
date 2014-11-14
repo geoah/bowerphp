@@ -182,6 +182,13 @@ class GithubRepository implements RepositoryInterface
      */
     private function getDepBowerJson($version)
     {
+        // first check if repo has been moved
+        try {
+            $response = $this->httpClient->get($this->url);
+            $this->setUrl($response->getEffectiveUrl());
+        } catch (RequestException $e) {
+            throw new RuntimeException(sprintf('Cannot open repo url %s (%s).', $url, $e->getMessage()));
+        }
         $depBowerJsonURL = $this->url . '/' . $version . '/bower.json';
         try {
             $request = $this->httpClient->get($depBowerJsonURL);
